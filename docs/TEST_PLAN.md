@@ -28,3 +28,17 @@ API contract tests, property-based input fuzzing, auth/ownership negatives, abus
 ## Quality gates
 
 No severity 1/2 known defects, CI green, keyboard review done, mobile browser checked, privacy notices reviewed, no credentials or customer data in logs. Test report must include platform/browser/version and real evidence — do not mark unexecuted browser tests as passed.
+
+## v0.4 test matrix
+
+| Test | Command | Evidence/limitation |
+|---|---|---|
+| Syntax, crypto, draft, server, storage, API integration | `npm run check` | 35/35 passed in Node 22 |
+| Local HTTP real encryption and short-link revocation | `npm test` (`tests/letters-api.test.mjs`) | Passed for v1, v2, wrong password, owner revoke, restart |
+| TLS full API roundtrip | `NODE_EXTRA_CA_CERTS=qa/certs/local.crt DEAR_URL=https://127.0.0.1:4174 node qa/https_smoke.mjs` | Passed with explicitly trusted local self-signed cert |
+| Semantic labels + targeted WCAG contrast | `python qa/a11y_audit.py` | Passed targeted static rules; not full WCAG compliance |
+| Chromium DOM UI 1280, 390, 320 px | `python qa/browser_smoke.py` | Passed via `set_content` and mocked storage, NOT real navigation |
+| Real browser HTTPS short-link v1/v2 + revoke | `DEAR_URL=https://staging.example.com python qa/e2e_real.py` | BLOCKED here: `ERR_BLOCKED_BY_ADMINISTRATOR`; run on real staging |
+| Screen readers, axe, keyboard-only, customer environment | manual QA | NOT performed; remains blocking |
+
+Do not report E2E/a11y fully passed from Node and DOM-only tests.

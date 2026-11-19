@@ -1,4 +1,4 @@
-# SRS v0.1 — Dear Letter (Working specification)
+# SRS v0.2 — Dear Letter (Working specification)
 
 ## Scope
 
@@ -18,10 +18,10 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 | FR-002 | Body must not be empty and is limited to 3,000 characters. | Must | Implemented |
 | FR-003 | Preview updates when fields, colors, and typography change. | Must | Implemented |
 | FR-004 | Choose among four paper themes and three fonts. | Must | Implemented |
-| FR-005 | Author explicitly saves draft locally and can delete it. | Must | Implemented |
+| FR-005 | Author explicitly saves up to 12 local drafts, can reopen/update/delete each or clear all; no auto-saving; migrate legacy saved draft on explicit save. | Must | Implemented (browser QA partially verified) |
 | FR-006 | Author can create a link for a letter encrypted in the browser. | Must | Implemented |
 | FR-007 | Recipient can use the complete link to open and read that letter. | Must | Implemented (browser QA pending) |
-| FR-008 | Reader can open a staged-envelope view; content not injected as HTML. | Must | Implemented (browser QA pending) |
+| FR-008 | Reader can open an animated, keyboard-accessible envelope view with reduced-motion fallback; content not injected as HTML. | Must | Implemented (browser QA partially verified) |
 | FR-009 | UI works on desktop and mobile widths. | Must | CSS implemented (browser QA pending) |
 | FR-010 | Copy link with manual fallback if Clipboard API unavailable. | Must | Implemented (browser QA pending) |
 
@@ -69,3 +69,38 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 ## Notes
 
 The earlier competitor-analysis SRS is not substituted for verified requirements; re-validate competitor behaviors by permitted browsing and mark findings as observations. Avoid copying competitor implementation.
+
+## v0.2 acceptance additions
+
+- FR-005a: Saving a draft creates exactly one new entry; saving edits updates the same ID.
+- FR-005b: Up to 12 drafts are allowed; attempt to save a 13th produces a message and does not overwrite data.
+- FR-005c: A v0.1 single draft can be reopened; converting it writes v2 only after an explicit save.
+- FR-005d: Confirm before discarding unsaved text when switching to another draft or creating a new letter.
+- FR-008a: Opening the recipient envelope reveals the letter and focuses the title; reduced-motion setting bypasses animation.
+
+
+## v0.3 security/performance amendment (2026-11-19)
+
+- FR-SEC-01: Author MAY choose a password (12–128 chars); if chosen, app emits v2 link without raw AES key and warns to deliver password separately.
+- FR-SEC-02: Recipient of v2 must input correct password before the letter is revealed; v1 remains readable without password.
+- FR-SEC-03: App clears displayed decrypted text and input password when reader dialog closes.
+- NFR-SEC-04: Allowlist all static HTTP resources; enable strict security headers; never cache HTML.
+- NFR-PERF-05: Compress static text assets and support conditional ETag revalidation; batch preview changes to animation frames.
+- Unresolved: user identities, revocable short links, backend, commercial compliance and browser E2E. See `docs/SECURITY_AUDIT_v0.3.md`.
+
+## v0.4 implemented backend functional slice (new requirements)
+
+| ID | Priority | Requirement | Acceptance |
+|---|---|---|---|
+| FR-B01 | P0 | Sender can publish encrypted letter and receive a 24-character opaque short ID | POST returns 201, ID, expiry and independent revoke credential |
+| FR-B02 | P0 | Server never receives v1 AES key or v2 passphrase | Verified by integration test; only sealed format accepted |
+| FR-B03 | P0 | Recipients open `/l/:id`, read stored ciphertext and decrypt locally | v1 uses URL fragment key, v2 password; old v1/v2 legacy fragments still supported |
+| FR-B04 | P0 | Sender can revoke an unexpired letter using secret capability | DELETE succeeds for valid capability; GET afterwards 404, invalid capability 401/404 |
+| FR-B05 | P0 | Server enforces expiry | UI requests 7 days, server caps 1–30, expired GET 404 and cleanup runs periodically |
+| FR-B06 | P1 | Sender retains capabilities locally to revoke via sent list | Revocation list operates only on same browser; documented limitations |
+| NFR-B01 | P0 | Bound abusive writes and body size | 20 creates/hour/IP, 24k request max, 2k active records, safe 4xx errors |
+| NFR-B02 | P0 | Store only encrypted content and revoke hash | SHA-256 revoke digest, no raw decrypt key, 0600 file mode on supporting OS |
+| NFR-B03 | P0 | HTTPS for external traffic | Local TLS tested; public staging TLS and browser acceptance remain blocked |
+| NFR-B04 | P1 | Accessible controls and mobile | static WCAG contrast check, 44px targets, DOM smoke at 320/390/1280px; axe/manual audit pending |
+
+**Deployment restriction:** Browser/HTTP E2E against trusted public HTTPS, privacy review and transactional durability are launch blockers. Current file store is a controlled-beta prototype.

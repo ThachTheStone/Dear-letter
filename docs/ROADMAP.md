@@ -33,3 +33,24 @@ All milestones are *targets*, not promises. Prioritize verified functionality ov
 ## Suggested organization
 
 Issue label families: `P0/P1/P2/P3`, `frontend/backend/security/qa/docs/infra`, `blocked`, `ready-for-review`. One vertical deliverable per PR. Human review for platform selection, security changes and billing. Maintain a rolling change log in `handoffs/LATEST.md`.
+
+## Progress: v0.2 (2026-11-19)
+
+- Implemented: explicit local multi-draft library (12 max), read/update/delete, legacy migration, original recipient envelope animation.
+- Verified: 15 Node tests; mocked DOM Chromium smoke at 1280/390/320px (do not confuse with actual HTTP E2E).
+- Blocked: real browser navigation (`ERR_BLOCKED_BY_ADMINISTRATOR`) and live deployment; owner must validate real browser E2E before release.
+- See `docs/RELEASE_NOTES_v0.2.md` and `handoffs/LATEST.md`.
+
+
+## v0.3 completed slice — 2026-11-19
+
+- Security hardening (optional password links, strict static routes, browser isolation headers, bounded draft parsing).
+- Static text compression / ETag revalidation; requestAnimationFrame preview batching.
+- Unit/integration tests, transfer benchmark, Chromium DOM-only smoke.
+
+Next: real HTTPS E2E and accessibility audit; staged deployment; revocable server-backed short links with privacy review.
+
+
+## v0.4 progress — 2026-11-19
+
+M2 single-instance **prototype** shipped locally: ciphertext-only short links, TTL, secret-based revoke, simple bounded persistence, API tests, local TLS integration, staging Compose/Caddy deployment recipe. NOT a production relational database, no user identity or public staging. For verified/blocked details read `docs/RELEASE_NOTES_v0.4.md`, `docs/DEPLOYMENT_STAGING_v0.4.md`, `handoffs/LATEST.md`. M1 browser/a11y gate remains BLOCKED until real HTTPS Playwright, axe and manual keyboard/screen-reader checks succeed. M2 commercial gate still TODO: transactional database, backups/restore, multi-replica, abuse/identity and operational controls.

@@ -51,3 +51,32 @@ Requirements for the migration: data model (`users`, `letters`, `assets`, `repor
 - `POST /v1/reports` report abuse; limit and moderate.
 
 Use database migrations, endpoint integration tests, an OpenAPI contract and ADR before any server implementation. Do not store raw unlock keys on the same service holding ciphertext without explicit documented trade-off.
+
+
+### v0.3 client-side protection options
+
+`v1` places ciphertext and raw encryption key in the URL fragment; this remains supported for old letters.
+
+`v2` uses random 16-byte salt, PBKDF2-HMAC-SHA256 (600k) deriving an AES-GCM key from a user-supplied password, random 12-byte IV, and only puts salt+IV+ciphertext in the fragment. No API or server-side data. Strong password must be sent separately. No recovery, revocation, or recipient authentication.
+
+The Node static server now serves an allowlist of app assets with bounded in-process cache and Brotli/gzip conditional revalidation; this is not a production deployment architecture. See v0.3 audit.
+
+## v0.4 CURRENT IMPLEMENTATION (supersedes the earlier historical v0.1 diagram above)
+
+```
+Browser WebCrypto
+  | encrypt letter; v1 AES key stays in #key fragment, v2 passphrase stays with reader
+  v
+POST /api/letters { sealed: 'v1.iv.cipher'|'v2.salt.iv.cipher', ttlDays: 7 }
+  | 20 creations/hour/IP; max 24k JSON; 2k active records
+  v
+Node API + bounded single-process encrypted record store
+  | .data/letters.json atomic rename on a persistent filesystem
+  | only SHA-256 hash of revoke capability, NO AES key or passphrase
+  v
+GET /api/letters/:id → ciphertext, no-store    DELETE /api/letters/:id → bearer revoke capability
+  ^
+  | Browser /l/:id reads ciphertext and decrypts locally
+```
+
+`src/letters-api.js` holds client transport and local sender capability records. `scripts/letter-store.mjs` holds local file store; `scripts/letters-api.mjs` handles APIs; `scripts/server.mjs` handles TLS, static assets, healthz and API routing. HTTP app endpoint must be behind trusted HTTPS edge (or local test TLS). No multi-node process synchronization, DB transaction durability, identity, abuse controls, public staging validation, or user authorization beyond revocation capability.

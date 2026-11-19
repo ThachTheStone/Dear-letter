@@ -1,3 +1,5 @@
+> Latest audit: [SECURITY_AUDIT_v0.3.md](SECURITY_AUDIT_v0.3.md). Some statements below describe historical v0.1 threat boundaries; see v0.3 audit for current mitigations.
+
 # Security, Privacy and Threat Model
 
 ## Existing protection and scope
@@ -33,3 +35,11 @@
 ## Pre-production security gates
 
 Threat model signed off; SAST/dependency scans; pen test proportional to scope; HTTPS verified; backend authZ negative tests; content abuse response; privacy policy and retention; restore drills; signed payment callbacks if billing exists; secret rotation and incident runbook.
+
+## v0.4 short-link threat boundary
+
+Server API stores only authenticated-encryption ciphertext, IV and (for v2) salt, along with expiry, random ID and SHA-256 revoke-token hash. Browser retains decryption material in URL fragment (v1) or sender-supplied passphrase (v2). A browser extension, copied URL, XSS/compromised origin, or recipient copying the revealed content can bypass intended privacy; DO NOT claim independently verified E2EE or guaranteed destruction of viewed letters.
+
+`localStorage` stores plaintext drafts and, separately, bearer **revocation** credentials. The author loses revocation ability if the browser profile is cleared. Invalid/missing revoke capability produces 401/404 without revealing whether a guessed letter exists. Storage writes use atomic replacement but are NOT equivalent to a transactional database/backup guarantee.
+
+Production controls still required: transactional DB, encrypted backups and tested restore, abuse moderation/rate limits at edge, persistent per-user quotas, owner authentication or recovery design, privacy policy/retention controls, visibility and incident response, domain/TLS/HSTS verification, CSP/OWASP review, and real Chrome/Firefox/WebKit E2E plus accessibility audit. See `docs/DEPLOYMENT_STAGING_v0.4.md` and `docs/RELEASE_NOTES_v0.4.md`.
