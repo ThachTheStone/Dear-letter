@@ -53,7 +53,9 @@ Requirements for the migration: data model (`users`, `letters`, `assets`, `repor
 Use database migrations, endpoint integration tests, an OpenAPI contract and ADR before any server implementation. Do not store raw unlock keys on the same service holding ciphertext without explicit documented trade-off.
 
 
-### v0.3 client-side protection options
+### v0.3 client-side protection options (planned)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 `v1` places ciphertext and raw encryption key in the URL fragment; this remains supported for old letters.
 
@@ -61,7 +63,9 @@ Use database migrations, endpoint integration tests, an OpenAPI contract and ADR
 
 The Node static server now serves an allowlist of app assets with bounded in-process cache and Brotli/gzip conditional revalidation; this is not a production deployment architecture. See v0.3 audit.
 
-## v0.4 CURRENT IMPLEMENTATION (supersedes the earlier historical v0.1 diagram above)
+## v0.4 PLANNED DESIGN (not implemented; v0.1 above is current)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 ```
 Browser WebCrypto

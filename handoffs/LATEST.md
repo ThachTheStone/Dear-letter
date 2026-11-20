@@ -1,34 +1,43 @@
-# LATEST HANDOFF — Dear Letter v0.4 (2026-11-19)
+# LATEST HANDOFF — 2026-11-20
 
-## Source-of-truth and remote
+- Date: 2026-11-20
+- Agent / role: Claude Code (Release/QA)
+- Task ID: T-029 (fix CI), T-028 (now BLOCKED)
+- Branch: `feat/v0.4-backend-https-staging` (based on `82750af`). Commit SHA: see `git log` for this branch; it was not recorded in the file because the commit includes this file.
 
-Source for v0.4 in the generated downloadable package and patch; **GitHub main was previously verified at v0.1**, with a v0.2 release-note-only branch. Do not claim v0.4 code is remotely committed until SHA and GitHub tree are verified. The current environment cannot reach GitHub via `git`; it can read some GitHub data via connector, but cannot upload local source files using the container's git CLI.
+## What happened
 
-## Implemented in this batch
+CI run 44546732675 on `82750af` failed before any test ran:
 
-- `scripts/letter-store.mjs`: bounded ciphertext-only JSON store (atomic file writes, one Node process, 2000 active records, 7d default TTL, hourly expiry sweeps, hashed revoke secret).
-- `scripts/letters-api.mjs`: POST/GET/DELETE endpoints, bearer revocation, content type/size validation, per-IP quotas, no-store response.
-- `scripts/server.mjs`: route /l/:id and /api/letters, optional HTTPS via local cert/key, reject non-TLS production without explicit trusted reverse-proxy flag, healthz, CSP connect-src 'self'.
-- `src/letters-api.js`, `src/app.js`, `src/index.html`, `src/style.css`: short-link publication, v1 key kept in # fragment, v2 password path, sent list + revocation, error states, contrast, 44px targets. Legacy v1/v2 fragment read retained.
-- `tests/letter-store.test.mjs`, `tests/letters-api.test.mjs`, `qa/https_smoke.mjs`, updated `qa/e2e_real.py`, `qa/a11y_audit.py`, `qa/browser_smoke.py`.
-- `Dockerfile`, `compose.staging.yml`, `deploy/Caddyfile`, `docs/DEPLOYMENT_STAGING_v0.4.md`, release notes, ADR and SRS updates.
+```
+node --check src/drafts.js
+Error: Cannot find module '.../src/drafts.js'  (MODULE_NOT_FOUND)
+```
 
-## Verification (precise)
+Commit `82750af` changed `package.json` to check `src/drafts.js`, `src/drafts-ui.js`, `src/letters-api.js`, `scripts/letter-store.mjs` and `scripts/letters-api.mjs`, but none of those files were committed. The commit only added docs and deploy config. The previous handoff said the v0.4 source existed only in a "generated downloadable package and patch". That package could not be found on the owner's machine (project folder, `D:\`, user profile) or on GitHub (branches, stashes, releases, workflow artifacts, issues, PRs). `feat/v0.2-multi-drafts` is also docs-only.
 
-- Node v22.16.0: `npm run check` **35 tests passed, 0 failed**; includes v1/v2 WebCrypto roundtrip via Node, persistence across process restart and revocation.
-- Real TLS local (self-signed certificate explicitly trusted): `qa/https_smoke.mjs` PASS HTTPS + API create/get/decrypt/revoke.
-- `python qa/a11y_audit.py`: PASS static semantic checks and 8 targeted color-contrast pairs all >=4.5:1; NOT full axe/manual a11y.
-- `python qa/browser_smoke.py`: PASS DOM-only 1280/390/320 px, no horizontal scroll, draft interactions; mocked storage, NOT real HTTP/browser E2E.
-- Chromium direct HTTPS navigation `https://127.0.0.1:4174`: FAIL `net::ERR_BLOCKED_BY_ADMINISTRATOR` in this tool environment.
-- Brotli static transfer 8 current assets 17,333 bytes; 7 v0.3 assets 14,367 bytes. New functionality adds 20.6% transfer; no Core Web Vitals measurement.
-- Compose/Docker NOT executed (Docker not installed in this environment). No public DNS/VM/HTTPS staging account supplied. No public deployment claimed.
+**The code in this repository is still v0.1.** The "35/35 tests passed" and other v0.2–v0.4 evidence in older docs came from another environment and is **not verified**.
 
-## Important security / operational gaps
+## Changes in this commit
 
-No sender identity, recipient identity, recovery for lost revoke token, moderation, transactional database, multi-instance support, fsync guarantee, measured high-load scaling, encrypted backup/restore, independent threat review, verified public domain/staging, axe or cross-browser/assistive-tech E2E. Browser-local drafts plaintext. Key-containing v1 URL fragments accessible to anyone with full link; weak v2 passwords vulnerable to offline guessing. Revocation stops *new* fetches, not copies already seen.
+- `package.json`, `README.md`: restored from `main` (v0.1 `check` script and version). Removed the `bench` and `test:e2e` scripts because `scripts/benchmark.mjs` and `qa/` don't exist. Added a README section that points to the planned work.
+- `docs/RELEASE_NOTES_v0.2.md`, `v0.3`, `v0.4`, `docs/SECURITY_AUDIT_v0.3.md`, `docs/DEPLOYMENT_STAGING_v0.4.md`: added a "Not implemented" banner.
+- `docs/ARCHITECTURE.md`, `ROADMAP.md`, `SECURITY.md`, `SRS.md`, `TEST_PLAN.md`: v0.2–v0.4 sections relabelled as planned. SRS FR-005/FR-008 restored to their v0.1 wording.
+- `docs/DECISIONS.md`: ADR-004/005/006 status changed to "Proposed — not implemented".
+- `agent/TASKS.md`: T-011–T-016 and T-019–T-023 reset from DONE to TODO, T-028 set to BLOCKED, T-029 added.
+- `Dockerfile`, `compose.staging.yml` and `deploy/Caddyfile` were left unchanged. **The Compose healthcheck calls `/healthz`, which the v0.1 server doesn't provide**, so the staging recipe won't work until the backend is built.
 
-## Next agent task
+## Verification
 
-1. Apply vetted v0.1→v0.4 patch to a branch created from current GitHub main (verify actual remote HEAD). Run `npm run check`, `python qa/a11y_audit.py`; push PR without touching workflow files if OAuth lacks workflow scope.
-2. Provision genuine public staging with TLS/DNS and persistent volume, then run `qa/e2e_real.py` on a workstation with unrestricted browser navigation, plus axe/keyboard/assistive-technology testing. Validate restore and rollback.
-3. Design Postgres migration/owner identity/recovery, abuse reporting, monitoring, legal privacy retention and incident response prior to customer onboarding.
+- `npm run check` locally (Node ≥20): syntax checks pass, **6/6 tests pass**.
+- Browser QA: not applicable (no UI change).
+
+## Next highest-priority task
+
+1. If the original v0.4 archive turns up, apply it on this branch, run `npm run check`, and remove the "Not implemented" banners for whatever ships.
+2. Otherwise, rebuild from the specs in small PRs with tests. Start with T-011 (multi-draft library), then T-014/T-015 (v0.3 security), then T-019+ (backend). Each needs its own ADR confirmation and passing tests before its docs are marked DONE.
+
+## Human approvals needed
+
+- Decide whether to rebuild v0.2–v0.4 or drop those branches.
+- Review and merge this branch. Not pushed to `main`.

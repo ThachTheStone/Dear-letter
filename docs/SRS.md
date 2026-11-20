@@ -1,4 +1,4 @@
-# SRS v0.2 — Dear Letter (Working specification)
+# SRS v0.1 — Dear Letter (Working specification)
 
 ## Scope
 
@@ -18,10 +18,10 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 | FR-002 | Body must not be empty and is limited to 3,000 characters. | Must | Implemented |
 | FR-003 | Preview updates when fields, colors, and typography change. | Must | Implemented |
 | FR-004 | Choose among four paper themes and three fonts. | Must | Implemented |
-| FR-005 | Author explicitly saves up to 12 local drafts, can reopen/update/delete each or clear all; no auto-saving; migrate legacy saved draft on explicit save. | Must | Implemented (browser QA partially verified) |
+| FR-005 | Author explicitly saves draft locally and can delete it. | Must | Implemented |
 | FR-006 | Author can create a link for a letter encrypted in the browser. | Must | Implemented |
 | FR-007 | Recipient can use the complete link to open and read that letter. | Must | Implemented (browser QA pending) |
-| FR-008 | Reader can open an animated, keyboard-accessible envelope view with reduced-motion fallback; content not injected as HTML. | Must | Implemented (browser QA partially verified) |
+| FR-008 | Reader can open a staged-envelope view; content not injected as HTML. | Must | Implemented (browser QA pending) |
 | FR-009 | UI works on desktop and mobile widths. | Must | CSS implemented (browser QA pending) |
 | FR-010 | Copy link with manual fallback if Clipboard API unavailable. | Must | Implemented (browser QA pending) |
 
@@ -70,7 +70,9 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 
 The earlier competitor-analysis SRS is not substituted for verified requirements; re-validate competitor behaviors by permitted browsing and mark findings as observations. Avoid copying competitor implementation.
 
-## v0.2 acceptance additions
+## v0.2 acceptance additions (planned)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 - FR-005a: Saving a draft creates exactly one new entry; saving edits updates the same ID.
 - FR-005b: Up to 12 drafts are allowed; attempt to save a 13th produces a message and does not overwrite data.
@@ -79,7 +81,9 @@ The earlier competitor-analysis SRS is not substituted for verified requirements
 - FR-008a: Opening the recipient envelope reveals the letter and focuses the title; reduced-motion setting bypasses animation.
 
 
-## v0.3 security/performance amendment (2026-11-19)
+## v0.3 security/performance amendment (planned)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 - FR-SEC-01: Author MAY choose a password (12–128 chars); if chosen, app emits v2 link without raw AES key and warns to deliver password separately.
 - FR-SEC-02: Recipient of v2 must input correct password before the letter is revealed; v1 remains readable without password.
@@ -88,7 +92,9 @@ The earlier competitor-analysis SRS is not substituted for verified requirements
 - NFR-PERF-05: Compress static text assets and support conditional ETag revalidation; batch preview changes to animation frames.
 - Unresolved: user identities, revocable short links, backend, commercial compliance and browser E2E. See `docs/SECURITY_AUDIT_v0.3.md`.
 
-## v0.4 implemented backend functional slice (new requirements)
+## v0.4 backend functional slice (planned requirements)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 | ID | Priority | Requirement | Acceptance |
 |---|---|---|---|

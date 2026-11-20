@@ -1,18 +1,14 @@
 {
   "name": "dear-letter",
-  "version": "0.4.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Privacy-first letter app with revocable encrypted short links for single-process staging",
+  "description": "Independent digital-letter MVP with client-side encryption",
   "scripts": {
     "dev": "node scripts/server.mjs",
     "start": "node scripts/server.mjs",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check src/app.js && node --check src/crypto.js && node --check src/drafts.js && node --check src/drafts-ui.js && node --check src/letters-api.js && node --check scripts/server.mjs && node --check scripts/letter-store.mjs && node --check scripts/letters-api.mjs && npm test",
-    "bench": "node scripts/benchmark.mjs",
-    "test:e2e": "python qa/e2e_real.py"
+    "check": "node --check src/app.js && node --check src/crypto.js && node --check scripts/server.mjs && npm test"
   },
-  "engines": {
-    "node": ">=20"
-  }
+  "engines": { "node": ">=20" }
 }

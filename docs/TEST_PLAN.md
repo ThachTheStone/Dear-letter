@@ -29,7 +29,9 @@ API contract tests, property-based input fuzzing, auth/ownership negatives, abus
 
 No severity 1/2 known defects, CI green, keyboard review done, mobile browser checked, privacy notices reviewed, no credentials or customer data in logs. Test report must include platform/browser/version and real evidence — do not mark unexecuted browser tests as passed.
 
-## v0.4 test matrix
+## v0.4 test matrix (planned)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 | Test | Command | Evidence/limitation |
 |---|---|---|

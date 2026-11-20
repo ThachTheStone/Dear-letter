@@ -13,14 +13,14 @@
 | T-009 | P1 | TODO | Frontend | Refine envelope interactions and independent design tokens | approved UI design + screenshot |
 | T-010 | P1 | TODO | Infra | Static preview deploy and smoke verify | CI green, HTTPS |
 
-| T-011 | P1 | DONE | Frontend | Multi-draft library: read/save/update/delete with v0.1 migration | 6 new unit tests + browser DOM smoke |
-| T-012 | P1 | DONE | Frontend | CSS-based animated opening envelope and reduced-motion path | DOM smoke + manual source review; real E2E pending |
-| T-013 | P1 | DONE | QA | HTTP security header and static module integration tests | 3 server checks pass |
+| T-011 | P1 | TODO | Frontend | Multi-draft library: read/save/update/delete with v0.1 migration | 6 new unit tests + browser DOM smoke |
+| T-012 | P1 | TODO | Frontend | CSS-based animated opening envelope and reduced-motion path | DOM smoke + manual source review; real E2E pending |
+| T-013 | P1 | TODO | QA | HTTP security header and static module integration tests | 3 server checks pass |
 
 
-| T-014 | P0 | DONE | Security | Optional password-protected v2 links + v1 backward compatibility | password roundtrip, incorrect password and tamper tests |
-| T-015 | P1 | DONE | Backend | Strict public asset allowlist + CSP/COOP/CORP/Permissions Policy | HTTP negative and header tests |
-| T-016 | P1 | DONE | Performance | Brotli/gzip, ETag, rAF preview | transfer-size benchmark + conditional-request checks |
+| T-014 | P0 | TODO | Security | Optional password-protected v2 links + v1 backward compatibility | password roundtrip, incorrect password and tamper tests |
+| T-015 | P1 | TODO | Backend | Strict public asset allowlist + CSP/COOP/CORP/Permissions Policy | HTTP negative and header tests |
+| T-016 | P1 | TODO | Performance | Brotli/gzip, ETag, rAF preview | transfer-size benchmark + conditional-request checks |
 | T-017 | P0 | BLOCKED | QA | True v1/v2 WebCrypto E2E in real HTTP browser | Chromium localhost blocked; run on developer workstation |
 | T-018 | P0 | TODO | Security | Stage HTTPS, HSTS, authenticated revocable URLs, monitoring, abuse reporting | production security review |
 
@@ -28,13 +28,16 @@
 
 | ID | Priority | Status | Task | Evidence / Gate |
 |---|---|---|---|---|
-| T-019 | P0 | DONE local | Short-link ciphertext-only Node API and 7-day expiry | tests + restart verified |
-| T-020 | P0 | DONE local | 256-bit secret owner revoke endpoint and sender UI | owner and invalid token integration tests |
-| T-021 | P0 | DONE local | API abuse limits, bounded storage and hourly cleanup | automated tests, manual review |
-| T-022 | P0 | DONE local | Local HTTPS TLS/API crypto roundtrip | `qa/https_smoke.mjs` PASS |
-| T-023 | P0 | DONE partial | Accessibility contrast remediation and DOM smoke | targeted static audit PASS; axe/manual NOT done |
+| T-019 | P0 | TODO | Short-link ciphertext-only Node API and 7-day expiry | tests + restart verified |
+| T-020 | P0 | TODO | 256-bit secret owner revoke endpoint and sender UI | owner and invalid token integration tests |
+| T-021 | P0 | TODO | API abuse limits, bounded storage and hourly cleanup | automated tests, manual review |
+| T-022 | P0 | TODO | Local HTTPS TLS/API crypto roundtrip | `qa/https_smoke.mjs` PASS |
+| T-023 | P0 | TODO | Accessibility contrast remediation and DOM smoke | targeted static audit PASS; axe/manual NOT done |
 | T-024 | P0 | BLOCKED | Real Chrome/Firefox/WebKit over HTTPS | browser admin block; external staging not provisioned |
 | T-025 | P0 | BLOCKED | Public staging deployment on DNS/VM | owner infrastructure access required |
 | T-026 | P0 | TODO | Multi-tenant transactional DB, identity and reliable recovery | security architecture/approval |
 | T-027 | P0 | TODO | Privacy/abuse moderation, backup restore, monitoring | commercial release gate |
-| T-028 | P0 | TODO | Apply v0.4 source to GitHub branch, PR + CI | local patch archive created; remote SHA verification needed |
+| T-028 | P0 | BLOCKED | Apply v0.4 source to GitHub branch, PR + CI | v0.4 source package not found locally or on GitHub (2026-11-20); needs the original archive or a rebuild |
+| T-029 | P0 | DONE | Fix CI on `feat/v0.4-backend-https-staging`: restore v0.1 `check` script, mark v0.2–v0.4 docs as not implemented | `npm run check` 6/6 pass |
+
+> **Status correction (2026-11-20):** T-011–T-016 and T-019–T-023 were previously marked DONE, but their source code was never committed. Reset to TODO until code lands in the repository with passing tests.

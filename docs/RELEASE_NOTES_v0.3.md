@@ -1,5 +1,7 @@
 # Dear Letter v0.3: Security and Performance Hardening
 
+> **⚠ Not implemented — status corrected 2026-11-20.** The source code this document describes was never committed to this repository; the branch contains v0.1 code only (`src/app.js`, `src/crypto.js`, `scripts/server.mjs`, 6 tests). Treat this as a design/specification. Test results and evidence below were reported from another environment and could not be verified here.
+
 Status: **Development release; not approved for production deployment.**
 
 ## Delivered

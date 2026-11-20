@@ -1,5 +1,7 @@
 # v0.4 staging deployment — single-instance, encrypted letter delivery
 
+> **⚠ Not implemented — status corrected 2026-11-20.** The source code this document describes was never committed to this repository; the branch contains v0.1 code only (`src/app.js`, `src/crypto.js`, `scripts/server.mjs`, 6 tests). Treat this as a design/specification. Test results and evidence below were reported from another environment and could not be verified here.
+
 **Status:** deployment recipe + local HTTPS integration verified, not a deployed public staging site. All credentials/DNS/cloud infrastructure must be supplied by the owner. This implementation is for controlled beta, **NOT commercial production**. Do not copy competitor code or assets.
 
 ## Architecture

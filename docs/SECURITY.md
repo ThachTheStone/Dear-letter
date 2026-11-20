@@ -1,4 +1,4 @@
-> Latest audit: [SECURITY_AUDIT_v0.3.md](SECURITY_AUDIT_v0.3.md). Some statements below describe historical v0.1 threat boundaries; see v0.3 audit for current mitigations.
+> Planned v0.3 audit: [SECURITY_AUDIT_v0.3.md](SECURITY_AUDIT_v0.3.md) — describes code not present in this repository. The sections below describe the current v0.1 threat boundary.
 
 # Security, Privacy and Threat Model
 
@@ -36,7 +36,9 @@
 
 Threat model signed off; SAST/dependency scans; pen test proportional to scope; HTTPS verified; backend authZ negative tests; content abuse response; privacy policy and retention; restore drills; signed payment callbacks if billing exists; secret rotation and incident runbook.
 
-## v0.4 short-link threat boundary
+## v0.4 short-link threat boundary (planned)
+
+> **Not implemented:** the code for this section was never committed to the repository (status corrected 2026-11-20). Planned design only.
 
 Server API stores only authenticated-encryption ciphertext, IV and (for v2) salt, along with expiry, random ID and SHA-256 revoke-token hash. Browser retains decryption material in URL fragment (v1) or sender-supplied passphrase (v2). A browser extension, copied URL, XSS/compromised origin, or recipient copying the revealed content can bypass intended privacy; DO NOT claim independently verified E2EE or guaranteed destruction of viewed letters.
 

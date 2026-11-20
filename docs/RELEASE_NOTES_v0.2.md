@@ -1,5 +1,7 @@
 # Dear Letter v0.2 — Draft Library & Recipient Envelope
 
+> **⚠ Not implemented — status corrected 2026-11-20.** The source code this document describes was never committed to this repository; the branch contains v0.1 code only (`src/app.js`, `src/crypto.js`, `scripts/server.mjs`, 6 tests). Treat this as a design/specification. Test results and evidence below were reported from another environment and could not be verified here.
+
 Date: 2026-11-19. Status: **local implementation verified; production release NOT approved**.
 
 ## Shipped behavior

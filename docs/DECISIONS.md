@@ -33,7 +33,7 @@ Use original HTML, CSS, copy, graphics and name. The category is inspired by Dea
 
 ## ADR-004: Optional password-protected v2 URL
 
-**Status:** Accepted for development v0.3; production security review pending (2026-11-19).
+**Status:** Proposed — not implemented (code never committed; corrected 2026-11-20).
 
 **Decision:** Keep v1 decoding, add opt-in v2 with PBKDF2-HMAC-SHA256 600,000 rounds and AES-GCM, salt+IV+ciphertext in fragment, no key. Avoid additional dependencies. Password cannot be recovered; require sender to communicate it out of band.
 
@@ -41,7 +41,7 @@ Use original HTML, CSS, copy, graphics and name. The category is inspired by Dea
 
 ## ADR-005: Static asset allowlist, conditional caching and compression
 
-**Status:** Accepted for local dev server only.
+**Status:** Proposed — not implemented (code never committed; corrected 2026-11-20).
 
 **Decision:** Whitelist public files explicitly, do not expose other paths, cache small assets with ETags, support Brotli/gzip, keep HTML no-store. Add modern browser isolation headers.
 
@@ -49,7 +49,7 @@ Use original HTML, CSS, copy, graphics and name. The category is inspired by Dea
 
 ## ADR-006: v0.4 minimal ciphertext-only short-link backend
 
-**Status:** Accepted for single-instance staging prototype only. Reviewed for initial threat boundaries, **not** approved for commercial production.
+**Status:** Proposed — not implemented (code never committed; corrected 2026-11-20). Design reviewed for initial threat boundaries only.
 
 **Problem:** v0.3 places the entire ciphertext in long URLs without expiry/revocation, and some messengers truncate those URLs.
 
