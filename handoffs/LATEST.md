@@ -3,7 +3,7 @@
 - Date: 2026-11-20
 - Agent / role: Claude Code (planner, reviewer, QA). Code for T-012 written by DeepSeek (`deepseek-v4-flash`) through the Cline CLI 3.0.74, from a scoped brief, then reviewed and verified by Claude Code.
 - Task: T-012, Vietnamese diacritics in the serif preview (NFR-008)
-- Branch: `feat/t012-vietnamese-diacritics`, based on `main` `246bbb7` (merge of PR #1). Commit SHA: see the branch's `git log`; it isn't recorded here because the commit includes this file.
+- Branch: `feat/t012-vietnamese-diacritics`, based on `e35c7b5` (T-011), which is already in `main` via merge commit `246bbb7`, so the PR diff is T-012 only. Commit SHA: see the branch's `git log`; it isn't recorded here because the commit includes this file.
 
 ## Done today
 
