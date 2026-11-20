@@ -18,7 +18,7 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 | FR-002 | Body must not be empty and is limited to 3,000 characters. | Must | Implemented |
 | FR-003 | Preview updates when fields, colors, and typography change. | Must | Implemented |
 | FR-004 | Choose among four paper themes and three fonts. | Must | Implemented |
-| FR-005 | Author explicitly saves draft locally and can delete it. | Must | Implemented |
+| FR-005 | Author explicitly saves up to 12 local drafts, can reopen/update/delete each or delete all; no auto-saving; a v0.1 draft migrates only on explicit save. | Must | Implemented (T-011; unit + headless Chrome smoke) |
 | FR-006 | Author can create a link for a letter encrypted in the browser. | Must | Implemented |
 | FR-007 | Recipient can use the complete link to open and read that letter. | Must | Implemented (browser QA pending) |
 | FR-008 | Reader can open a staged-envelope view; content not injected as HTML. | Must | Implemented (browser QA pending) |
@@ -69,3 +69,13 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 ## Notes
 
 The earlier competitor-analysis SRS is not substituted for verified requirements; re-validate competitor behaviors by permitted browsing and mark findings as observations. Avoid copying competitor implementation.
+
+## FR-005 acceptance criteria (T-011, implemented 2026-11-20)
+
+- FR-005a: Saving a new letter creates exactly one draft; saving again updates the same draft.
+- FR-005b: At most 12 drafts. Saving a 13th shows a message and changes nothing.
+- FR-005c: A v0.1 single draft is listed and can be opened; it's converted to the new format, and the old key removed, only when the author saves it.
+- FR-005d: Opening another draft or starting a new letter asks before discarding unsaved changes. Deleting one draft or all drafts asks first.
+- FR-005e: Loading the page never writes to storage and doesn't auto-fill the editor.
+- FR-005f: Corrupt or oversized stored data is reported, never silently overwritten; "Xóa tất cả" recovers.
+- Drafts stay plaintext in this browser's `localStorage` and aren't synced. The UI says so.

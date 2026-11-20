@@ -1,4 +1,4 @@
-# Agent Task Board — 2026-11-18
+# Agent Task Board — 2026-11-20
 
 | ID | Priority | Status | Owner role | Task | Gate |
 |---|---|---|---|---|---|
@@ -12,3 +12,5 @@
 | T-008 | P1 | TODO | Architect | Plan server-side short links and revocation ADR | security sign-off |
 | T-009 | P1 | TODO | Frontend | Refine envelope interactions and independent design tokens | approved UI design + screenshot |
 | T-010 | P1 | TODO | Infra | Static preview deploy and smoke verify | CI green, HTTPS |
+| T-011 | P1 | DONE | Frontend | Multi-draft library: save/update/open/delete/clear, 12-draft cap, v0.1 migration on explicit save | 12 unit tests (`tests/drafts.test.mjs`) + 19-check headless Chrome smoke (`qa/drafts-smoke.mjs`) |
+| T-012 | P2 | TODO | Frontend | Vietnamese diacritics render detached in Georgia/italic preview text (e.g. "mến" → "mê´n"); pre-existing since v0.1 | screenshot at 1280/390px after fix |

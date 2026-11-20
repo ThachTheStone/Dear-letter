@@ -28,3 +28,12 @@ API contract tests, property-based input fuzzing, auth/ownership negatives, abus
 ## Quality gates
 
 No severity 1/2 known defects, CI green, keyboard review done, mobile browser checked, privacy notices reviewed, no credentials or customer data in logs. Test report must include platform/browser/version and real evidence — do not mark unexecuted browser tests as passed.
+
+## Draft library (T-011 / FR-005)
+
+| Test | Command | Coverage |
+|---|---|---|
+| Unit | `npm run check` (`tests/drafts.test.mjs`, 12 tests) | create/update, 12-draft cap, legacy migration, no write on load, delete/clear, corrupt/oversized storage, untrusted entries, storage quota failure |
+| Browser smoke | `npm run dev`, then `node qa/drafts-smoke.mjs "<chrome path>"` | 19 checks in headless Chrome: legacy migration, update, confirm/cancel flows, HTML-as-text, 12-cap, delete/clear, corrupt data, encrypt→open link, 1280/390/320px layout and 44px targets, no console errors |
+
+Not covered: real screen reader, Firefox/WebKit, manual keyboard-only pass.

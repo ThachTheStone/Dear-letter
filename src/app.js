@@ -1,8 +1,8 @@
 import { encryptLetter, decryptLetter, MAX_LETTER_CHARS, MAX_SHARE_URL_CHARS } from './crypto.js';
+import { loadDrafts, saveDraft, deleteDraft, clearDrafts, sanitizeDraftFields, DraftError, MAX_DRAFTS, DRAFTS_KEY, LEGACY_KEY } from './drafts.js';
 
 const $ = id => document.getElementById(id);
 const form = $('letter-form');
-const draftKey = 'dear-letter:draft:v1';
 const read = id => $(id).value;
 const getLetter = () => ({ recipient: read('recipient'), sender: read('sender'), title: read('title'), body: read('body'), theme: new FormData(form).get('theme') || 'rose', font: read('font') });
 function setSafeText(id, value) { $(id).textContent = value; }
@@ -38,26 +38,121 @@ $('copy-link').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText($('share-url').value); setSafeText('status', 'Đã sao chép liên kết.'); }
   catch { $('share-url').focus(); $('share-url').select(); setSafeText('status', 'Không thể sao chép tự động. Hãy sao chép liên kết từ ô bên trên.'); }
 });
-$('save-draft').addEventListener('click', () => {
-  try { localStorage.setItem(draftKey, JSON.stringify(getLetter())); setSafeText('status', 'Đã lưu nháp trên trình duyệt này (không mã hóa).'); }
-  catch { setSafeText('status', 'Không lưu được nháp trên trình duyệt này.'); }
-});
-$('clear-draft').addEventListener('click', () => {
-  localStorage.removeItem(draftKey);
-  form.reset(); $('body').value = ''; render();
-  setSafeText('status', 'Đã xóa bản nháp được lưu trên thiết bị và làm mới biểu mẫu.');
-});
-try {
-  const raw = localStorage.getItem(draftKey);
-  if (raw) {
-    const l = JSON.parse(raw);
-    for (const id of ['recipient', 'sender', 'title', 'body']) $(id).value = String(l[id] ?? '').slice(0, id === 'body' ? 3000 : 100);
-    if (['rose','cream','sage','night'].includes(l.theme)) form.querySelector(`input[name="theme"][value="${l.theme}"]`).checked = true;
-    if (['serif','handwritten','modern'].includes(l.font)) $('font').value = l.font;
-    setSafeText('status', 'Đã khôi phục bản nháp đã lưu trên thiết bị này.');
+// ---- Draft library (T-011). Drafts are plaintext in this browser's localStorage only. ----
+const storage = (() => { try { return window.localStorage; } catch { return null; } })();
+let currentDraftId = null;
+let savedSnapshot = '';
+const snapshot = () => JSON.stringify(sanitizeDraftFields(getLetter()));
+const isDirty = () => snapshot() !== savedSnapshot;
+const confirmDiscard = () => !isDirty() || window.confirm('Thư đang viết có thay đổi chưa lưu. Bỏ các thay đổi này?');
+const dateFormat = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+function fillForm(fields) {
+  const f = sanitizeDraftFields(fields);
+  for (const id of ['recipient', 'sender', 'title', 'body']) $(id).value = f[id];
+  // f.theme is restricted to the allowlist, so it is safe inside the selector.
+  form.querySelector(`input[name="theme"][value="${f.theme}"]`).checked = true;
+  $('font').value = f.font;
+  render();
+}
+
+function draftItem(draft) {
+  const li = document.createElement('li');
+  li.className = 'draft-item';
+  if (draft.id === currentDraftId) li.setAttribute('aria-current', 'true');
+  const info = document.createElement('div');
+  info.className = 'draft-info';
+  const title = document.createElement('strong');
+  title.textContent = draft.title.trim() || draft.body.trim().slice(0, 40) || '(Chưa có tiêu đề)';
+  const meta = document.createElement('small');
+  const to = draft.recipient.trim() ? `Gửi ${draft.recipient.trim()} · ` : '';
+  meta.textContent = draft.legacy ? `${to}Bản nháp cũ — lưu lại để chuyển sang thư viện` : `${to}Lưu lúc ${dateFormat.format(new Date(draft.updatedAt))}`;
+  info.append(title, meta);
+  const label = title.textContent;
+  const open = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn-quiet', textContent: 'Mở' });
+  open.setAttribute('aria-label', `Mở bản nháp: ${label}`);
+  open.addEventListener('click', () => openDraft(draft));
+  const del = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn-quiet', textContent: 'Xóa' });
+  del.setAttribute('aria-label', `Xóa bản nháp: ${label}`);
+  del.addEventListener('click', () => removeDraft(draft, label));
+  li.append(info, open, del);
+  return li;
+}
+
+function renderDrafts() {
+  const list = $('drafts-list');
+  if (!storage) {
+    list.replaceChildren();
+    setSafeText('drafts-empty', 'Trình duyệt này không cho phép lưu nháp (bộ nhớ bị chặn).');
+    $('save-draft').disabled = true;
+    return;
   }
-} catch { setSafeText('status', 'Không thể khôi phục bản nháp.'); }
+  let result;
+  try { result = loadDrafts(storage); } catch { result = { drafts: [], corrupt: true }; }
+  const { drafts, corrupt } = result;
+  list.replaceChildren(...drafts.map(draftItem));
+  setSafeText('drafts-count', `(${drafts.filter(d => !d.legacy).length}/${MAX_DRAFTS})`);
+  $('drafts-empty').hidden = drafts.length > 0 && !corrupt;
+  setSafeText('drafts-empty', corrupt
+    ? 'Dữ liệu nháp trên thiết bị bị hỏng và không đọc được. Hãy dùng “Xóa tất cả” để bắt đầu lại.'
+    : 'Chưa có bản nháp nào. Nhấn “Lưu nháp trên thiết bị” để giữ lại thư đang viết.');
+  $('clear-drafts').hidden = drafts.length === 0 && !corrupt;
+}
+
+function openDraft(draft) {
+  if (draft.id !== currentDraftId && !confirmDiscard()) return;
+  fillForm(draft);
+  currentDraftId = draft.id;
+  savedSnapshot = snapshot();
+  renderDrafts();
+  setSafeText('status', `Đã mở bản nháp “${draft.title.trim() || 'Chưa có tiêu đề'}”.`);
+  $('title').focus();
+}
+
+function removeDraft(draft, label) {
+  if (!window.confirm(`Xóa vĩnh viễn bản nháp “${label}”? Không thể hoàn tác.`)) return;
+  try {
+    deleteDraft(storage, draft.id);
+    // Keep the editor contents, but treat them as unsaved so the next save creates a new draft.
+    if (draft.id === currentDraftId) { currentDraftId = null; savedSnapshot = ''; }
+    setSafeText('status', 'Đã xóa bản nháp.');
+  } catch (error) { setSafeText('status', error.message); }
+  renderDrafts();
+}
+
+$('save-draft').addEventListener('click', () => {
+  try {
+    const { id, created } = saveDraft(storage, getLetter(), { id: currentDraftId });
+    currentDraftId = id;
+    savedSnapshot = snapshot();
+    setSafeText('status', created ? 'Đã lưu bản nháp mới trên trình duyệt này (không mã hóa).' : 'Đã cập nhật bản nháp.');
+  } catch (error) {
+    setSafeText('status', error instanceof DraftError ? error.message : 'Không lưu được nháp trên trình duyệt này.');
+  }
+  renderDrafts();
+});
+$('new-letter').addEventListener('click', () => {
+  if (!confirmDiscard()) return;
+  form.reset(); render();
+  currentDraftId = null;
+  savedSnapshot = snapshot();
+  renderDrafts();
+  setSafeText('status', 'Đã mở một lá thư mới.');
+  $('recipient').focus();
+});
+$('clear-drafts').addEventListener('click', () => {
+  if (!window.confirm('Xóa tất cả bản nháp đã lưu trên trình duyệt này? Không thể hoàn tác. Thư đang viết vẫn được giữ.')) return;
+  try { clearDrafts(storage); setSafeText('status', 'Đã xóa tất cả bản nháp.'); }
+  catch { setSafeText('status', 'Không xóa được bản nháp.'); }
+  currentDraftId = null; savedSnapshot = '';
+  renderDrafts();
+});
+// Keep the list in sync when drafts change in another tab.
+window.addEventListener('storage', event => { if (event.key === null || event.key === DRAFTS_KEY || event.key === LEGACY_KEY) renderDrafts(); });
+
 render();
+savedSnapshot = snapshot();
+renderDrafts();
 
 async function showLetterFromHash() {
   if (!location.hash.startsWith('#letter=')) return;
