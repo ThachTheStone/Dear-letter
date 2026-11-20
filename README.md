@@ -17,10 +17,10 @@ npm run check
 - Responsive home page and guided letter editor.
 - Fields: recipient, sender, title, body (up to 3,000 characters).
 - Four paper themes, three font styles, immediate preview.
-- **Opt-in** browser-local draft storage; clear drafts.
+- **Opt-in** browser-local draft library: save up to 12 drafts, reopen, update or delete each, or delete all (plaintext, this browser only).
 - AES-256-GCM encrypt/decrypt in the browser; recipient opens the complete share URL to reveal an animated-envelope-style reading modal.
 - Basic security headers on the local Node server; static assets are deployable.
-- Six automated unit tests; a GitHub Actions CI workflow.
+- 18 automated unit tests, a dependency-free headless Chrome smoke test (`qa/drafts-smoke.mjs`), and a GitHub Actions CI workflow.
 
 ## Important limitations
 
