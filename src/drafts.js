@@ -88,7 +88,7 @@ function writeStored(storage, drafts) {
   try {
     storage.setItem(DRAFTS_KEY, JSON.stringify({ version: 2, drafts: drafts.map(({ legacy, ...d }) => d) }));
   } catch {
-    throw new DraftError('storage', 'Không lưu được nháp: bộ nhớ trình duyệt đầy hoặc bị chặn.');
+    throw new DraftError('storage', 'Could not save the draft: this browser’s storage is full or blocked.');
   }
 }
 
@@ -99,9 +99,9 @@ function writeStored(storage, drafts) {
  */
 export function saveDraft(storage, value, { id = null, now = Date.now(), makeId = newDraftId } = {}) {
   const fields = sanitizeDraftFields(value);
-  if (isEmptyDraft(fields)) throw new DraftError('empty', 'Bản nháp đang trống, chưa có gì để lưu.');
+  if (isEmptyDraft(fields)) throw new DraftError('empty', 'This draft is empty — there is nothing to save yet.');
   const { drafts, corrupt } = readStored(storage);
-  if (corrupt) throw new DraftError('corrupt', 'Dữ liệu nháp trên thiết bị bị hỏng. Hãy dùng “Xóa tất cả” rồi lưu lại.');
+  if (corrupt) throw new DraftError('corrupt', 'Saved draft data on this device is damaged. Use “Delete all”, then save again.');
   const index = id && id !== LEGACY_ID ? drafts.findIndex(d => d.id === id) : -1;
   if (index >= 0) {
     drafts[index] = { ...drafts[index], ...fields, updatedAt: now };
@@ -109,7 +109,7 @@ export function saveDraft(storage, value, { id = null, now = Date.now(), makeId 
     return { id, created: false };
   }
   if (drafts.length >= MAX_DRAFTS) {
-    throw new DraftError('limit', `Đã đủ ${MAX_DRAFTS} bản nháp. Hãy xóa bớt một bản trước khi lưu thư mới.`);
+    throw new DraftError('limit', `You already have ${MAX_DRAFTS} drafts. Delete one before saving a new letter.`);
   }
   const newId = makeId();
   writeStored(storage, [...drafts, { id: newId, updatedAt: now, ...fields }]);
@@ -120,7 +120,7 @@ export function saveDraft(storage, value, { id = null, now = Date.now(), makeId 
 export function deleteDraft(storage, id) {
   if (id === LEGACY_ID) { storage.removeItem(LEGACY_KEY); return; }
   const { drafts, corrupt } = readStored(storage);
-  if (corrupt) throw new DraftError('corrupt', 'Dữ liệu nháp bị hỏng. Hãy dùng “Xóa tất cả”.');
+  if (corrupt) throw new DraftError('corrupt', 'Saved draft data is damaged. Use “Delete all”.');
   const remaining = drafts.filter(d => d.id !== id);
   if (remaining.length !== drafts.length) writeStored(storage, remaining);
 }

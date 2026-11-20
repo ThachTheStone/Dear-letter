@@ -10,33 +10,33 @@ function render() {
   const l = getLetter();
   const paper = $('paper');
   paper.className = `paper theme-${l.theme} font-${l.font}`;
-  setSafeText('preview-title', l.title || 'Một lời gửi đến bạn');
-  setSafeText('preview-recipient', l.recipient || 'người đặc biệt');
-  setSafeText('preview-body', l.body || 'Mọi câu chuyện đẹp đều bắt đầu bằng một lời muốn nói...\n\nHãy viết điều đang ở trong tim bạn, và nhìn nó hiện lên ngay tại đây.');
-  setSafeText('preview-sender', l.sender || 'một người luôn nhớ bạn');
+  setSafeText('preview-title', l.title || 'A message for you');
+  setSafeText('preview-recipient', l.recipient || 'someone special');
+  setSafeText('preview-body', l.body || 'Every good story starts with something you want to say...\n\nWrite what is in your heart and watch it appear right here.');
+  setSafeText('preview-sender', l.sender || 'someone who always remembers you');
   setSafeText('count', `${l.body.length} / ${MAX_LETTER_CHARS}`);
   $('share-result').hidden = true;
 }
-const today = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
+const today = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date());
 setSafeText('preview-date', today);
 setSafeText('year', new Date().getFullYear());
 form.addEventListener('input', render);
 form.addEventListener('change', render);
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  setSafeText('status', 'Đang mã hóa bức thư…');
+  setSafeText('status', 'Encrypting your letter…');
   try {
     const fragment = await encryptLetter(getLetter());
     const shareUrl = `${location.origin}${location.pathname}${fragment}`;
-    if (shareUrl.length > MAX_SHARE_URL_CHARS) throw new Error('Thư quá dài để chia sẻ bằng liên kết. Hãy rút ngắn nội dung.');
+    if (shareUrl.length > MAX_SHARE_URL_CHARS) throw new Error('This letter is too long to share as a link. Please shorten it.');
     $('share-url').value = shareUrl;
     $('share-result').hidden = false;
-    setSafeText('status', 'Thư đã được mã hóa trên thiết bị. Bạn có thể sao chép liên kết.');
-  } catch (error) { setSafeText('status', error.message || 'Không thể tạo liên kết.'); }
+    setSafeText('status', 'Your letter is encrypted on this device. You can copy the link now.');
+  } catch (error) { setSafeText('status', error.message || 'Could not create the link.'); }
 });
 $('copy-link').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('share-url').value); setSafeText('status', 'Đã sao chép liên kết.'); }
-  catch { $('share-url').focus(); $('share-url').select(); setSafeText('status', 'Không thể sao chép tự động. Hãy sao chép liên kết từ ô bên trên.'); }
+  try { await navigator.clipboard.writeText($('share-url').value); setSafeText('status', 'Link copied.'); }
+  catch { $('share-url').focus(); $('share-url').select(); setSafeText('status', 'Could not copy automatically. Please copy the link from the field above.'); }
 });
 // ---- Draft library (T-011). Drafts are plaintext in this browser's localStorage only. ----
 const storage = (() => { try { return window.localStorage; } catch { return null; } })();
@@ -44,8 +44,8 @@ let currentDraftId = null;
 let savedSnapshot = '';
 const snapshot = () => JSON.stringify(sanitizeDraftFields(getLetter()));
 const isDirty = () => snapshot() !== savedSnapshot;
-const confirmDiscard = () => !isDirty() || window.confirm('Thư đang viết có thay đổi chưa lưu. Bỏ các thay đổi này?');
-const dateFormat = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const confirmDiscard = () => !isDirty() || window.confirm('This letter has unsaved changes. Discard them?');
+const dateFormat = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
 function fillForm(fields) {
   const f = sanitizeDraftFields(fields);
@@ -63,17 +63,17 @@ function draftItem(draft) {
   const info = document.createElement('div');
   info.className = 'draft-info';
   const title = document.createElement('strong');
-  title.textContent = draft.title.trim() || draft.body.trim().slice(0, 40) || '(Chưa có tiêu đề)';
+  title.textContent = draft.title.trim() || draft.body.trim().slice(0, 40) || '(Untitled)';
   const meta = document.createElement('small');
-  const to = draft.recipient.trim() ? `Gửi ${draft.recipient.trim()} · ` : '';
-  meta.textContent = draft.legacy ? `${to}Bản nháp cũ — lưu lại để chuyển sang thư viện` : `${to}Lưu lúc ${dateFormat.format(new Date(draft.updatedAt))}`;
+  const to = draft.recipient.trim() ? `To ${draft.recipient.trim()} · ` : '';
+  meta.textContent = draft.legacy ? `${to}Older draft — save it to add it to your library` : `${to}Saved ${dateFormat.format(new Date(draft.updatedAt))}`;
   info.append(title, meta);
   const label = title.textContent;
-  const open = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn-quiet', textContent: 'Mở' });
-  open.setAttribute('aria-label', `Mở bản nháp: ${label}`);
+  const open = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn-quiet', textContent: 'Open' });
+  open.setAttribute('aria-label', `Open draft: ${label}`);
   open.addEventListener('click', () => openDraft(draft));
-  const del = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn-quiet', textContent: 'Xóa' });
-  del.setAttribute('aria-label', `Xóa bản nháp: ${label}`);
+  const del = Object.assign(document.createElement('button'), { type: 'button', className: 'btn btn-quiet', textContent: 'Delete' });
+  del.setAttribute('aria-label', `Delete draft: ${label}`);
   del.addEventListener('click', () => removeDraft(draft, label));
   li.append(info, open, del);
   return li;
@@ -83,7 +83,7 @@ function renderDrafts() {
   const list = $('drafts-list');
   if (!storage) {
     list.replaceChildren();
-    setSafeText('drafts-empty', 'Trình duyệt này không cho phép lưu nháp (bộ nhớ bị chặn).');
+    setSafeText('drafts-empty', 'This browser does not allow saving drafts (browser storage is blocked).');
     $('save-draft').disabled = true;
     return;
   }
@@ -94,8 +94,8 @@ function renderDrafts() {
   setSafeText('drafts-count', `(${drafts.filter(d => !d.legacy).length}/${MAX_DRAFTS})`);
   $('drafts-empty').hidden = drafts.length > 0 && !corrupt;
   setSafeText('drafts-empty', corrupt
-    ? 'Dữ liệu nháp trên thiết bị bị hỏng và không đọc được. Hãy dùng “Xóa tất cả” để bắt đầu lại.'
-    : 'Chưa có bản nháp nào. Nhấn “Lưu nháp trên thiết bị” để giữ lại thư đang viết.');
+    ? 'Saved draft data on this device is damaged and cannot be read. Use “Delete all” to start again.'
+    : 'No saved drafts yet. Choose “Save draft on this device” to keep the letter you are writing.');
   $('clear-drafts').hidden = drafts.length === 0 && !corrupt;
 }
 
@@ -105,17 +105,17 @@ function openDraft(draft) {
   currentDraftId = draft.id;
   savedSnapshot = snapshot();
   renderDrafts();
-  setSafeText('status', `Đã mở bản nháp “${draft.title.trim() || 'Chưa có tiêu đề'}”.`);
+  setSafeText('status', `Opened draft “${draft.title.trim() || 'Untitled'}”.`);
   $('title').focus();
 }
 
 function removeDraft(draft, label) {
-  if (!window.confirm(`Xóa vĩnh viễn bản nháp “${label}”? Không thể hoàn tác.`)) return;
+  if (!window.confirm(`Permanently delete draft “${label}”? This cannot be undone.`)) return;
   try {
     deleteDraft(storage, draft.id);
     // Keep the editor contents, but treat them as unsaved so the next save creates a new draft.
     if (draft.id === currentDraftId) { currentDraftId = null; savedSnapshot = ''; }
-    setSafeText('status', 'Đã xóa bản nháp.');
+    setSafeText('status', 'Draft deleted.');
   } catch (error) { setSafeText('status', error.message); }
   renderDrafts();
 }
@@ -125,9 +125,9 @@ $('save-draft').addEventListener('click', () => {
     const { id, created } = saveDraft(storage, getLetter(), { id: currentDraftId });
     currentDraftId = id;
     savedSnapshot = snapshot();
-    setSafeText('status', created ? 'Đã lưu bản nháp mới trên trình duyệt này (không mã hóa).' : 'Đã cập nhật bản nháp.');
+    setSafeText('status', created ? 'New draft saved in this browser (not encrypted).' : 'Draft updated.');
   } catch (error) {
-    setSafeText('status', error instanceof DraftError ? error.message : 'Không lưu được nháp trên trình duyệt này.');
+    setSafeText('status', error instanceof DraftError ? error.message : 'Could not save the draft in this browser.');
   }
   renderDrafts();
 });
@@ -137,13 +137,13 @@ $('new-letter').addEventListener('click', () => {
   currentDraftId = null;
   savedSnapshot = snapshot();
   renderDrafts();
-  setSafeText('status', 'Đã mở một lá thư mới.');
+  setSafeText('status', 'Started a new letter.');
   $('recipient').focus();
 });
 $('clear-drafts').addEventListener('click', () => {
-  if (!window.confirm('Xóa tất cả bản nháp đã lưu trên trình duyệt này? Không thể hoàn tác. Thư đang viết vẫn được giữ.')) return;
-  try { clearDrafts(storage); setSafeText('status', 'Đã xóa tất cả bản nháp.'); }
-  catch { setSafeText('status', 'Không xóa được bản nháp.'); }
+  if (!window.confirm('Delete all drafts saved in this browser? This cannot be undone. The letter you are writing stays in the editor.')) return;
+  try { clearDrafts(storage); setSafeText('status', 'All drafts deleted.'); }
+  catch { setSafeText('status', 'Could not delete the drafts.'); }
   currentDraftId = null; savedSnapshot = '';
   renderDrafts();
 });
@@ -161,10 +161,10 @@ async function showLetterFromHash() {
     const letter = await decryptLetter(location.hash);
     const paper = $('read-paper');
     paper.className = `paper read-paper theme-${letter.theme} font-${letter.font}`;
-    setSafeText('read-title', letter.title || 'Một lời gửi đến bạn');
-    setSafeText('read-recipient', letter.recipient || 'người đặc biệt');
+    setSafeText('read-title', letter.title || 'A message for you');
+    setSafeText('read-recipient', letter.recipient || 'someone special');
     setSafeText('read-body', letter.body);
-    setSafeText('read-sender', letter.sender || 'Một người thương bạn');
+    setSafeText('read-sender', letter.sender || 'Someone who cares about you');
     setSafeText('read-date', letter.date);
     $('read-envelope').hidden = false; paper.hidden = true;
     dialog.showModal();

@@ -5,10 +5,10 @@ export const MAX_SHARE_URL_CHARS = 12000;
 export const styles = Object.freeze(['rose', 'cream', 'sage', 'night']);
 export const fonts = Object.freeze(['serif', 'handwritten', 'modern']);
 export function normalizeLetter(value) {
-  if (!value || typeof value !== 'object') throw new Error('Dữ liệu thư không hợp lệ.');
+  if (!value || typeof value !== 'object') throw new Error('Invalid letter data.');
   const clean = (v, n) => String(v ?? '').trim().slice(0, n);
   const body = clean(value.body, MAX_LETTER_CHARS);
-  if (!body) throw new Error('Hãy viết nội dung bức thư trước khi chia sẻ.');
+  if (!body) throw new Error('Please write the letter before sharing it.');
   return {
     recipient: clean(value.recipient, 80), sender: clean(value.sender, 80),
     title: clean(value.title, 100), body,
@@ -25,7 +25,7 @@ export function toBase64Url(input) {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 export function fromBase64Url(str) {
-  if (!/^[A-Za-z0-9_-]+$/.test(str)) throw new Error('Liên kết thư không hợp lệ.');
+  if (!/^[A-Za-z0-9_-]+$/.test(str)) throw new Error('Invalid letter link.');
   const binary = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
   return Uint8Array.from(binary, c => c.charCodeAt(0));
 }
@@ -39,18 +39,18 @@ export async function encryptLetter(value) {
   return `#letter=v1.${toBase64Url(iv)}.${toBase64Url(ciphertext)}.${toBase64Url(rawKey)}`;
 }
 export async function decryptLetter(fragment) {
-  if (typeof fragment !== 'string' || fragment.length > MAX_SHARE_URL_CHARS) throw new Error('Liên kết quá dài hoặc không hợp lệ.');
+  if (typeof fragment !== 'string' || fragment.length > MAX_SHARE_URL_CHARS) throw new Error('The link is too long or invalid.');
   const match = fragment.match(/^#letter=v1\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/);
-  if (!match) throw new Error('Không tìm thấy dữ liệu thư hợp lệ.');
+  if (!match) throw new Error('No valid letter data found in this link.');
   const iv = fromBase64Url(match[1]);
   const data = fromBase64Url(match[2]);
   const rawKey = fromBase64Url(match[3]);
-  if (iv.length !== 12 || rawKey.length !== 32 || data.length > 20000) throw new Error('Dữ liệu thư không hợp lệ.');
+  if (iv.length !== 12 || rawKey.length !== 32 || data.length > 20000) throw new Error('Invalid letter data.');
   try {
     const key = await crypto.subtle.importKey('raw', rawKey, 'AES-GCM', false, ['decrypt']);
     const decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
     const parsed = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(decrypted));
     const normalized = normalizeLetter(parsed);
     return { ...normalized, date: /^\d{4}-\d{2}-\d{2}$/.test(parsed.date) ? parsed.date : normalized.date };
-  } catch { throw new Error('Không thể mở thư. Liên kết có thể đã bị thay đổi.'); }
+  } catch { throw new Error('Could not open the letter. The link may have been altered.'); }
 }

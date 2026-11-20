@@ -1,5 +1,17 @@
 # LATEST HANDOFF — 2026-11-20
 
+## Latest: T-015, English-only UI (ADR-007)
+
+- Owner request: the whole interface in English; Vietnamese UI no longer needed.
+- Branch: `feat/t015-english-ui`, stacked on `feat/t012-vietnamese-diacritics` (PR #2). Merge PR #2 first. The T-015 PR targets the T-012 branch, so after PR #2 merges, retarget it to `main`.
+- Code written by DeepSeek (`deepseek-v4-flash`) through the Cline CLI from a scoped brief, then reviewed and verified by Claude Code.
+- Changed: `src/index.html` (`lang="en"` and all copy), `src/app.js` (all messages, `en-GB` dates), `src/drafts.js` and `src/crypto.js` (error messages only; keys, codes and formats unchanged), `tests/crypto.test.mjs` (3 assertions), `qa/drafts-smoke.mjs` (5 assertions). Docs: ADR-007, SRS scope and NFR-008, README, TEST_PLAN, TASKS.
+- Kept: NFC normalization and the Unicode-capable serif stack, because letters can still be written in any language. Vietnamese and emoji stay as test *input* data.
+- Verification: `npm run check` 19/19; `qa/drafts-smoke.mjs` 19/19; `qa/diacritics-smoke.mjs` 8/8; scan of `src/` for Latin-extended characters finds 0 lines; no `innerHTML`; full-page screenshots at 1280px and an emulated 390px (scrollWidth 390, no overflow) reviewed.
+- Not done: copy review by a native English editor, Firefox/WebKit, screen reader.
+
+## Earlier today: T-012
+
 - Date: 2026-11-20
 - Agent / role: Claude Code (planner, reviewer, QA). Code for T-012 written by DeepSeek (`deepseek-v4-flash`) through the Cline CLI 3.0.74, from a scoped brief, then reviewed and verified by Claude Code.
 - Task: T-012, Vietnamese diacritics in the serif preview (NFR-008)
