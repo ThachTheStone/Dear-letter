@@ -20,7 +20,8 @@ npm run check
 - **Opt-in** browser-local draft library: save up to 12 drafts, reopen, update or delete each, or delete all (plaintext, this browser only).
 - AES-256-GCM encrypt/decrypt in the browser; recipient opens the complete share URL to reveal an animated-envelope-style reading modal.
 - Basic security headers on the local Node server; static assets are deployable.
-- 18 automated unit tests, a dependency-free headless Chrome smoke test (`qa/drafts-smoke.mjs`), and a GitHub Actions CI workflow.
+- 19 automated unit tests, dependency-free headless Chrome smoke tests (`qa/drafts-smoke.mjs`, `qa/diacritics-smoke.mjs`), and a GitHub Actions CI workflow.
+- Vietnamese text: typed input is normalized to NFC, and serif text uses a Vietnamese-capable font stack (`--serif-vi`) so diacritics stay attached.
 
 ## Important limitations
 

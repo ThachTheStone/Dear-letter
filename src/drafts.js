@@ -15,7 +15,8 @@ export class DraftError extends Error {
   constructor(code, message) { super(message); this.name = 'DraftError'; this.code = code; }
 }
 
-const clip = (value, max) => String(value ?? '').slice(0, max);
+// NFC first so a decomposition typed by the author can't split letter + diacritic or change the capped length.
+const clip = (value, max) => String(value ?? '').normalize('NFC').slice(0, max);
 
 /** Keep only known fields, cap their lengths and restrict theme/font to the allowlists. */
 export function sanitizeDraftFields(value) {
