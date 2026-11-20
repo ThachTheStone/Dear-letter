@@ -2,7 +2,7 @@
 
 ## Scope
 
-Build an original digital-letter application for Vietnamese-speaking users. This is a **target requirements document**, not a representation that the source competitor has all features or that all items are implemented.
+Build an original digital-letter application with an English user interface (ADR-007). Letters themselves may be written in any language. This is a **target requirements document**, not a representation that the source competitor has all features or that all items are implemented.
 
 ### Actors
 
@@ -47,7 +47,7 @@ Build an original digital-letter application for Vietnamese-speaking users. This
 - NFR-005 Performance: target p75 LCP <2.5s and CLS <0.1 on appropriate real-world mobile baseline; measure rather than assert.
 - NFR-006 Compatibility: modern Chrome, Firefox, Safari, Edge; test actual browsers.
 - NFR-007 Maintainability: reviewed PRs, CI gates, documented ADR and handoffs.
-- NFR-008 Localization: Vietnamese copy, proper Unicode normalization, no broken diacritics. *(T-012: editor input and saved drafts normalized to NFC; serif text uses a Vietnamese-capable font stack. Verified in headless Chrome on Windows only.)*
+- NFR-008 Localization: English UI copy (ADR-007); letter text in any language with proper Unicode normalization and no broken diacritics. *(T-012: editor input and saved drafts normalized to NFC; serif text uses a font stack that covers Vietnamese and other Latin-extended scripts. T-015: UI translated to English. Verified in headless Chrome on Windows only.)*
 
 ### Core acceptance scenarios
 

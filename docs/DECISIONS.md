@@ -26,6 +26,18 @@
 
 Use original HTML, CSS, copy, graphics and name. The category is inspired by Dearr but do not copy source code, images, logos or paid materials.
 
+## ADR-007: English-only user interface
+
+**Status:** Accepted (owner decision, 2026-11-20). Numbered 007 because ADR-004 to 006 are proposed on `feat/v0.4-backend-https-staging` (see T-014).
+
+**Context:** v0.1 shipped Vietnamese UI copy for Vietnamese-speaking users. The owner no longer needs Vietnamese.
+
+**Decision:** All UI copy, `lang`, dates and messages are English (`lang="en"`, `en-GB` date format). No i18n framework; strings stay inline. Letters may still be written in any language, so NFC normalization and the Unicode-capable serif stack from T-012 stay, and Unicode/Vietnamese/emoji input remains test data.
+
+**Risks:** Existing share links and drafts are unaffected (no format or key changes). Copy tone must stay as explicit about privacy as before.
+
+**Rollback:** Revert the T-015 PR.
+
 ## ADR template
 
 `ADR-NNN: Title`; Status; Context; Options; Decision; Risks; Test/rollback; Owner and Date.

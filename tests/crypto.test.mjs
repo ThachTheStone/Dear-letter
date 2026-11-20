@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { encryptLetter, decryptLetter, normalizeLetter, toBase64Url, fromBase64Url } from '../src/crypto.js';
-test('validates missing body', () => assert.throws(() => normalizeLetter({body:'  '}), /viết nội dung/));
+test('validates missing body', () => assert.throws(() => normalizeLetter({body:'  '}), /write the letter/));
 test('truncates untrusted long text and restricts theme and font', () => {
  const l=normalizeLetter({body:'X'.repeat(4000),theme:'evil',font:'unsafe',recipient:'a'.repeat(100)});
  assert.equal(l.body.length, 3000); assert.equal(l.theme,'rose'); assert.equal(l.font,'serif'); assert.equal(l.recipient.length,80);
@@ -16,6 +16,6 @@ test('AES GCM encrypt/decrypt roundtrip with unicode',async()=>{
 test('tampered ciphertext is rejected',async()=>{
  const fragment=await encryptLetter({body:'secret'});
  const parts=fragment.split('.'); const data=parts[2];parts[2]=(data[0]==='A'?'B':'A')+data.slice(1);
- await assert.rejects(decryptLetter(parts.join('.')),/Không thể mở thư/);
+ await assert.rejects(decryptLetter(parts.join('.')),/Could not open the letter/);
 });
-test('wrong fragment format rejected',async()=>{await assert.rejects(decryptLetter('#letter=v3.abc'),/hợp lệ/);});
+test('wrong fragment format rejected',async()=>{await assert.rejects(decryptLetter('#letter=v3.abc'),/No valid letter data/);});

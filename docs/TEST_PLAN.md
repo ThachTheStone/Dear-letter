@@ -17,7 +17,7 @@
 | E2E-07 | Test 320/375/768/1280 px | No critical overflow; interactive controls usable |
 | E2E-08 | Keyboard Tab/Shift-Tab/Enter/Escape | Dialog keyboard accessible, visible focus, logical order |
 | E2E-09 | `prefers-reduced-motion: reduce` | No unnecessary motion |
-| E2E-10 | 3,000-char Vietnamese/emoji message | Clear URL size feedback when necessary |
+| E2E-10 | 3,000-char Vietnamese/emoji message (letter text; UI is English per ADR-007) | Clear URL size feedback when necessary |
 | E2E-11 | Cross-browser Chromium/Firefox/WebKit | Core flows consistent |
 | E2E-12 | Inspect network for letter content | No plaintext letter API requests in v0.1 |
 

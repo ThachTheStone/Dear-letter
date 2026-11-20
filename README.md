@@ -1,6 +1,6 @@
 # Dear Letter
 
-A distinct, independent Vietnamese-language digital-letter web app. **Current status: v0.1 MVP / not yet approved for commercial release.** Built to help an agent team develop and eventually publish a production-quality product inspired by the general category of interactive letters, without copying third-party source, branding, illustrations, content, or assets.
+A distinct, independent digital-letter web app with an English interface. **Current status: v0.1 MVP / not yet approved for commercial release.** Built to help an agent team develop and eventually publish a production-quality product inspired by the general category of interactive letters, without copying third-party source, branding, illustrations, content, or assets.
 
 ## Run locally
 
@@ -21,7 +21,7 @@ npm run check
 - AES-256-GCM encrypt/decrypt in the browser; recipient opens the complete share URL to reveal an animated-envelope-style reading modal.
 - Basic security headers on the local Node server; static assets are deployable.
 - 19 automated unit tests, dependency-free headless Chrome smoke tests (`qa/drafts-smoke.mjs`, `qa/diacritics-smoke.mjs`), and a GitHub Actions CI workflow.
-- Vietnamese text: typed input is normalized to NFC, and serif text uses a Vietnamese-capable font stack (`--serif-vi`) so diacritics stay attached.
+- English interface (ADR-007). Letters can be written in any language: typed input is normalized to NFC, and serif text uses a font stack (`--serif-vi`) that keeps Vietnamese and other accented letters intact.
 
 ## Important limitations
 

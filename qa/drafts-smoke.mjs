@@ -50,7 +50,7 @@ await load();
 await evaluate(`localStorage.clear(); localStorage.setItem('dear-letter:draft:v1', JSON.stringify({ title: 'Thư cũ v0.1', body: 'Nội dung cũ ❤️', theme: 'night', font: 'handwritten' }));`);
 await load();
 let r = await evaluate(`${helpers} return { items: items(), v2: localStorage.getItem('dear-letter:drafts:v2'), count: $('drafts-count').textContent, emptyHidden: $('drafts-empty').hidden, editorBody: $('body').value };`);
-check('legacy draft listed on load', r.items.length === 1 && r.items[0].title === 'Thư cũ v0.1' && /Bản nháp cũ/.test(r.items[0].meta), JSON.stringify(r.items));
+check('legacy draft listed on load', r.items.length === 1 && r.items[0].title === 'Thư cũ v0.1' && /Older draft/.test(r.items[0].meta), JSON.stringify(r.items));
 check('no storage write on load (v2 key absent)', r.v2 === null);
 check('editor not auto-filled on load', r.editorBody === '');
 
@@ -62,7 +62,7 @@ check('legacy migrated on explicit save and old key removed', r.legacy === null 
 
 // 3. Save again updates same ID.
 r = await evaluate(`${helpers} const id = stored().drafts[0].id; type('body', 'Đã chỉnh sửa'); $('save-draft').click(); return { same: stored().drafts.length === 1 && stored().drafts[0].id === id && stored().drafts[0].body === 'Đã chỉnh sửa', status: $('status').textContent };`);
-check('second save updates same draft', r.same && /cập nhật/.test(r.status), r.status);
+check('second save updates same draft', r.same && /updated/.test(r.status), r.status);
 
 // 4. New letter with unsaved changes: cancel keeps text, accept clears.
 r = await evaluate(`${helpers} type('title', 'Chưa lưu'); window.__confirmAnswer = false; window.__confirms = []; $('new-letter').click();
@@ -79,13 +79,13 @@ check('HTML in draft title rendered as text', !r.xss && r.imgs === 0 && r.title.
 // 6. Fill to 12, 13th refused.
 r = await evaluate(`${helpers} for (let i = 0; i < 12; i++) { window.__confirmAnswer = true; $('new-letter').click(); type('body', 'Thư số ' + i); $('save-draft').click(); }
   return { n: stored().drafts.length, count: $('drafts-count').textContent, status: $('status').textContent, items: items().length };`);
-check('13th draft refused at 12 with message', r.n === 12 && r.items === 12 && r.count === '(12/12)' && /12 bản nháp/.test(r.status), JSON.stringify(r));
+check('13th draft refused at 12 with message', r.n === 12 && r.items === 12 && r.count === '(12/12)' && /12 drafts/.test(r.status), JSON.stringify(r));
 
 // 7. Delete one: cancel keeps, accept removes.
 r = await evaluate(`${helpers} const before = stored().drafts.length; window.__confirmAnswer = false; document.querySelectorAll('#drafts-list li')[1].querySelectorAll('button')[1].click(); const afterCancel = stored().drafts.length;
   window.__confirmAnswer = true; document.querySelectorAll('#drafts-list li')[1].querySelectorAll('button')[1].click(); return { before, afterCancel, after: stored().drafts.length, label: document.querySelector('#drafts-list li button').getAttribute('aria-label') };`);
 check('delete asks; cancel keeps, accept removes one', r.before === 12 && r.afterCancel === 12 && r.after === 11, JSON.stringify(r));
-check('row buttons have descriptive accessible names', /^Mở bản nháp: /.test(r.label), r.label);
+check('row buttons have descriptive accessible names', /^Open draft: /.test(r.label), r.label);
 
 // 8. Clear all keeps editor text.
 r = await evaluate(`${helpers} type('body', 'Giữ lại'); window.__confirmAnswer = true; $('clear-drafts').click(); return { v2: localStorage.getItem('dear-letter:drafts:v2'), items: items().length, empty: !$('drafts-empty').hidden, clearHidden: $('clear-drafts').hidden, body: $('body').value };`);
@@ -95,7 +95,7 @@ check('clear all removes drafts, shows empty state, keeps editor text', r.v2 ===
 await evaluate(`localStorage.setItem('dear-letter:drafts:v2', '{broken');`);
 await load();
 r = await evaluate(`${helpers} $('body').value = 'x'; $('body').dispatchEvent(new Event('input', { bubbles: true })); $('save-draft').click(); return { msg: $('drafts-empty').textContent, visible: !$('drafts-empty').hidden, clearVisible: !$('clear-drafts').hidden, raw: localStorage.getItem('dear-letter:drafts:v2'), status: $('status').textContent };`);
-check('corrupt storage reported, not overwritten, clear-all offered', r.visible && /hỏng/.test(r.msg) && r.clearVisible && r.raw === '{broken' && /hỏng/.test(r.status), JSON.stringify(r));
+check('corrupt storage reported, not overwritten, clear-all offered', r.visible && /damaged/.test(r.msg) && r.clearVisible && r.raw === '{broken' && /damaged/.test(r.status), JSON.stringify(r));
 
 // 10. Encrypted link still works end to end.
 await evaluate(`localStorage.clear();`);
