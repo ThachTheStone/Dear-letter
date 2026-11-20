@@ -33,7 +33,16 @@ No severity 1/2 known defects, CI green, keyboard review done, mobile browser ch
 
 | Test | Command | Coverage |
 |---|---|---|
-| Unit | `npm run check` (`tests/drafts.test.mjs`, 12 tests) | create/update, 12-draft cap, legacy migration, no write on load, delete/clear, corrupt/oversized storage, untrusted entries, storage quota failure |
+| Unit | `npm run check` (`tests/drafts.test.mjs`, 13 tests) | create/update, 12-draft cap, legacy migration, no write on load, delete/clear, corrupt/oversized storage, untrusted entries, storage quota failure |
 | Browser smoke | `npm run dev`, then `node qa/drafts-smoke.mjs "<chrome path>"` | 19 checks in headless Chrome: legacy migration, update, confirm/cancel flows, HTML-as-text, 12-cap, delete/clear, corrupt data, encrypt→open link, 1280/390/320px layout and 44px targets, no console errors |
 
 Not covered: real screen reader, Firefox/WebKit, manual keyboard-only pass.
+
+## Vietnamese diacritics (T-012 / NFR-008)
+
+| Test | Command | Coverage |
+|---|---|---|
+| Unit | `npm run check` (`tests/drafts.test.mjs`) | NFD input saved and returned as NFC |
+| Browser smoke | `npm run dev`, then `node qa/diacritics-smoke.mjs "<chrome path>"` | 8 checks in headless Chrome: NFD input previewed as NFC, no combining marks left, serif stack not led by Georgia, font Chrome actually used (`CSS.getPlatformFontsForNode`) is not Georgia for body/title/signature, no horizontal scroll at 390px, no console errors; screenshots at 1280/390px plus a Georgia "before" for comparison |
+
+Not covered: macOS/iOS/Android font availability (stack falls back to Noto Serif / Cambria / Palatino Linotype), Firefox/WebKit. Links created before this fix from NFD input are decrypted as-is (not re-normalized).

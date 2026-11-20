@@ -3,7 +3,7 @@ import { loadDrafts, saveDraft, deleteDraft, clearDrafts, sanitizeDraftFields, D
 
 const $ = id => document.getElementById(id);
 const form = $('letter-form');
-const read = id => $(id).value;
+const read = id => $(id).value.normalize('NFC');
 const getLetter = () => ({ recipient: read('recipient'), sender: read('sender'), title: read('title'), body: read('body'), theme: new FormData(form).get('theme') || 'rose', font: read('font') });
 function setSafeText(id, value) { $(id).textContent = value; }
 function render() {

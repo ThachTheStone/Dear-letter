@@ -139,6 +139,18 @@ test('sanitizeDraftFields caps lengths and keeps whitespace typed by the author'
   assert.equal(f.recipient.length, 80);
 });
 
+test('NFD input is stored and returned as NFC so diacritics stay attached to their letter', () => {
+  const s = memoryStorage();
+  const nfd = 'me\u0302\u0301n';
+  assert.notEqual(nfd, 'm\u1ebfn');
+  saveDraft(s, { recipient: nfd, title: nfd, body: `Chúc ${nfd} vui vẻ` }, { now: 1, makeId: ids });
+  const [draft] = loadDrafts(s).drafts;
+  assert.equal(draft.recipient, 'm\u1ebfn');
+  assert.equal(draft.title, 'm\u1ebfn');
+  assert.equal(draft.body, 'Chúc m\u1ebfn vui vẻ');
+  assert.ok(s.raw(DRAFTS_KEY).includes('"title":"m\u1ebfn"'), 'stored JSON is NFC');
+});
+
 test('newDraftId returns 32 lowercase hex characters', () => {
   const id = newDraftId();
   assert.match(id, /^[a-f0-9]{32}$/);
